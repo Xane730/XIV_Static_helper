@@ -1,0 +1,96 @@
+{
+  "Tank": [
+    {
+      "name": "Paladin",
+      "icon": "resources/images/Paladin_Icon.png"
+    },
+    {
+      "name": "Warrior",
+      "icon": "resources/images/Warrior_Icon.png"
+    },
+    {
+      "name": "Dark Knight",
+      "icon": "resources/images/Dark_Knight_Icon.png"
+    },
+    {
+      "name": "Gunbreaker",
+      "icon": "resources/images/Gunbreaker_Icon.png"
+    }
+  ],
+  "Heal": [
+    {
+      "name": "White Mage",
+      "icon": "resources/images/White_Mage_Icon.png"
+    },
+    {
+      "name": "Scholar",
+      "icon": "resources/images/Scholar_Icon.png"
+    },
+    {
+      "name": "Astrologian",
+      "icon": "resources/images/Astrologian_Icon.png"
+    },
+    {
+      "name": "Sage",
+      "icon": "resources/images/Sage_Icon.png"
+    }
+  ],
+  "Melee": [
+    {
+      "name": "Monk",
+      "icon": "resources/images/Monk_Icon.png"
+    },
+    {
+      "name": "Dragoon",
+      "icon": "resources/images/Dragoon_Icon.png"
+    },
+    {
+      "name": "Ninja",
+      "icon": "resources/images/Ninja_Icon.png"
+    },
+    {
+      "name": "Samurai",
+      "icon": "resources/images/Samurai_Icon.png"
+    },
+    {
+      "name": "Reaper",
+      "icon": "resources/images/Reaper_Icon.png"
+    },
+    {
+      "name": "Viper",
+      "icon": "resources/images/Viper_Icon.png"
+    }
+  ],
+  "Ranged Physical": [
+    {
+      "name": "Bard",
+      "icon": "resources/images/Bard_Icon.png"
+    },
+    {
+      "name": "Machinist",
+      "icon": "resources/images/Machinist_Icon.png"
+    },
+    {
+      "name": "Dancer",
+      "icon": "resources/images/Dancer_Icon.png"
+    }
+  ],
+  "Ranged Magical": [
+    {
+      "name": "Black Mage",
+      "icon": "resources/images/Black_Mage_Icon.png"
+    },
+    {
+      "name": "Summoner",
+      "icon": "resources/images/Summoner_Icon.png"
+    },
+    {
+      "name": "Red Mage",
+      "icon": "resources/images/Red_Mage_Icon.png"
+    },
+    {
+      "name": "Pictomancer",
+      "icon": "resources/images/Pictomancer_Icon.png"
+    }
+  ]
+}
