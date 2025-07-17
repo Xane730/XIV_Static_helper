@@ -72,9 +72,9 @@ function displayResults(validCombos) {
         return;
     }
 
-    area.innerHTML += `<p class="text-green-400 font-bold mb-2">${validCombos.length} valid static(s) found.</p>`;
+    area.innerHTML += `<p class="text-green-400 font-bold mb-4">${validCombos.length} valid static(s) found.</p>`;
 
-    validCombos.slice(0, 10).forEach((combo, idx) => {
+    validCombos.forEach((combo, idx) => {
         const combined = combo.map((job, i) => ({
         job,
         player: playerInfos[i].name
@@ -87,11 +87,23 @@ function displayResults(validCombos) {
         sorted.push(...combined.filter(p => MELEE_DPS.includes(p.job)).slice(0, 2));
         sorted.push(...combined.filter(p => RANGED_DPS.includes(p.job)).slice(0, 2));
 
-        area.innerHTML += `<p class="mb-1 font-bold">#${idx + 1}</p><ul class="mb-4 list-disc list-inside">`;
-        sorted.forEach(p => {
-        area.innerHTML += `<li><span class="text-yellow-200">${p.player}</span> → <span class="text-white">${p.job}</span></li>`;
-        });
-        area.innerHTML += `</ul>`;
-  });
+        const jobIcon = (jobName) => {
+        const entries = Object.values(jobData).flat();
+        const found = entries.find(j => j.name === jobName);
+        return found ? found.icon : '';
+        };
+
+        area.innerHTML += `
+        <div class="bg-[#003366] border border-white rounded p-4 mb-4 shadow-md w-[50%]">
+            <div class="text-lg font-bold text-white mb-2">#${idx + 1} Valid Static</div>
+            <div class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 items-center">
+            ${sorted.map(p => `
+                <img src="${jobIcon(p.job)}" alt="${p.job}" class="w-9 h-9 rounded" />
+                <span class="text-white">${p.player}</span>
+            `).join('')}
+            </div>
+        </div>
+        `;
+    });
 }
 
