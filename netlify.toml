@@ -1,2 +1,2 @@
 [build]
-functions = "netlfy/functions"
+functions = "xivapi-proxy/netlify/functions"
