@@ -115,7 +115,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function savePlayerData(index) {
-        console.log("test")
         const playerDiv = document.querySelectorAll('#players > div')[index - 1];
         const inputs = playerDiv.querySelectorAll('input[type="text"]');
         const checkboxes = playerDiv.querySelectorAll('input[type="checkbox"]');
@@ -149,7 +148,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     for (let i = 1; i <= 8; i++) {
-        console.log('zrze')
         loadPlayerData(i);
 
         const playerDiv = document.querySelectorAll('#players > div')[i - 1];

@@ -1,0 +1,28 @@
+plugins = []
+functionsDirectory = "/home/ytaniere/Documents/Perso/ProjetPerso/XIV_Static_helper/xivapi-proxy/netlify/functions"
+functionsDirectoryOrigin = "config-v1"
+headers = []
+redirects = []
+
+[functions]
+
+[functions."*"]
+
+[build]
+publish = "/home/ytaniere/Documents/Perso/ProjetPerso/XIV_Static_helper"
+publishOrigin = "default"
+functions = "/home/ytaniere/Documents/Perso/ProjetPerso/XIV_Static_helper/xivapi-proxy/netlify/functions"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
