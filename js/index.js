@@ -156,12 +156,10 @@ window.addEventListener('DOMContentLoaded', () => {
         const inputs = playerDiv.querySelectorAll('input[type="text"]');
         const checkboxes = playerDiv.querySelectorAll('input[type="checkbox"]');
 
-        // Enregistrement sur changement de texte
         inputs.forEach(input => {
             input.addEventListener('input', () => savePlayerData(i));
         });
 
-        // Enregistrement sur changement de job
         checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', () => savePlayerData(i));
         });
