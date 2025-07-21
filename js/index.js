@@ -1,5 +1,4 @@
-window.addEventListener('DOMContentLoaded', () => {
-    const jobData = {
+const jobData = {
         "Tank": [
             { "name": "Paladin", "icon": "../resources/images/Paladin_Icon.png" },
             { "name": "Warrior", "icon": "../resources/images/Warrior_Icon.png" },
@@ -32,6 +31,9 @@ window.addEventListener('DOMContentLoaded', () => {
             { "name": "Pictomancer", "icon": "../resources/images/Pictomancer_Icon.png" }
         ]
     };
+
+window.addEventListener('DOMContentLoaded', () => {
+    
 
     const playersContainer = document.getElementById('players');
     const jobEntries = Object.entries(jobData);
@@ -115,7 +117,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function savePlayerData(index) {
-        console.log("test")
         const playerDiv = document.querySelectorAll('#players > div')[index - 1];
         const inputs = playerDiv.querySelectorAll('input[type="text"]');
         const checkboxes = playerDiv.querySelectorAll('input[type="checkbox"]');
@@ -149,7 +150,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     for (let i = 1; i <= 8; i++) {
-        console.log('zrze')
         loadPlayerData(i);
 
         const playerDiv = document.querySelectorAll('#players > div')[i - 1];
