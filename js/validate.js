@@ -90,6 +90,8 @@ function displayResults(validCombos, preferredJobs) {
             player: playerInfos[i].name,
             preferred: preferredJobs[i]?.includes(job)
         }));
+        const preferredCount = combined.filter(p => p.preferred).length;
+        const preferenceScore = Math.round((preferredCount / 8) * 100);
 
         const sorted = [];
         sorted.push(...combined.filter(p => TANKS.includes(p.job)).slice(0, 2));
@@ -106,7 +108,8 @@ function displayResults(validCombos, preferredJobs) {
 
         area.innerHTML += `
         <div class="bg-[#003366] border border-white rounded p-4 mb-4 shadow-md w-[50%]">
-            <div class="text-lg font-bold text-white mb-2">#${idx + 1} Valid Static</div>
+            <div class="text-lg font-bold text-white mb-1">#${idx + 1} Valid Static</div>
+            <div class="text-sm text-yellow-300 mb-2">Preference match: ${preferenceScore}%</div>
             <div class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 items-center">
                 ${sorted.map(p => `
                     <label class="cursor-pointer label-glow">

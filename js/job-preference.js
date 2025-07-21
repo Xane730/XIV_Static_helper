@@ -9,7 +9,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
         function updateVisuals() {
             labels.forEach(label => {
-                // Supprimer tous les clones glow éventuels
                 const allImages = label.querySelectorAll('img');
                 allImages.forEach(img => {
                     if (img.classList.contains('job-glow')) img.remove();
@@ -30,7 +29,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     img.classList.add('opacity-100');
                     label.classList.add('label-glow');
 
-                    // Ajouter le glow derrière
                     const glow = img.cloneNode();
                     glow.className = 'job-glow';
                     glow.removeAttribute('alt');
