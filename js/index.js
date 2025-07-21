@@ -1,5 +1,4 @@
-window.addEventListener('DOMContentLoaded', () => {
-    const jobData = {
+const jobData = {
         "Tank": [
             { "name": "Paladin", "icon": "../resources/images/Paladin_Icon.png" },
             { "name": "Warrior", "icon": "../resources/images/Warrior_Icon.png" },
@@ -32,6 +31,9 @@ window.addEventListener('DOMContentLoaded', () => {
             { "name": "Pictomancer", "icon": "../resources/images/Pictomancer_Icon.png" }
         ]
     };
+
+window.addEventListener('DOMContentLoaded', () => {
+    
 
     const playersContainer = document.getElementById('players');
     const jobEntries = Object.entries(jobData);
