@@ -10,17 +10,28 @@ const RANGED_DPS = [
 document.getElementById('validateBtn').addEventListener('click', () => {
     const players = document.querySelectorAll('#players > div');
     const selectedRoles = [];
+    const preferredJobs = [];
 
-    players.forEach(player => {
-        const checked = player.querySelectorAll('input[type="checkbox"]:checked');
-        const jobs = Array.from(checked).map(c => c.value);
-        selectedRoles.push(jobs);
+    players.forEach((player, index) => {
+        const key = `player-${index + 1}-jobStates`;
+        const state = JSON.parse(sessionStorage.getItem(key)) || {};
+        const selected = Object.keys(state).filter(job => state[job] > 0);
+        const preferred = Object.keys(state).filter(job => state[job] === 2);
+        selectedRoles.push(selected);
+        preferredJobs.push(preferred);
     });
 
     const combinations = getCombinations(selectedRoles, 8);
     const valid = combinations.filter(isValidStatic);
 
-    displayResults(valid);
+    valid.sort((a, b) => {
+        const countPref = combo =>
+            combo.reduce((count, job, i) =>
+                count + (preferredJobs[i]?.includes(job) ? 1 : 0), 0);
+        return countPref(b) - countPref(a);
+    });
+
+    displayResults(valid, preferredJobs);
 });
 
 function getCombinations(arr, size) {
@@ -36,7 +47,6 @@ function isValidStatic(combo) {
     if (combo.length !== 8) return false;
 
     const flat = combo.flat();
-
     const uniqueJobs = new Set(flat);
     if (uniqueJobs.size !== flat.length) return false;
 
@@ -55,7 +65,7 @@ function isValidStatic(combo) {
     );
 }
 
-function displayResults(validCombos) {
+function displayResults(validCombos, preferredJobs) {
     const area = document.getElementById('resultArea');
     area.innerHTML = '';
 
@@ -72,12 +82,13 @@ function displayResults(validCombos) {
         return;
     }
 
-    area.innerHTML += `<p class="text-green-400 font-bold mb-4">${validCombos.length} valid static(s) found.</p>`;
+    area.innerHTML += `<p class="text-green-400 font-bold mb-4">${validCombos.length} valid static(s) found (sorted by preferred jobs).</p>`;
 
     validCombos.forEach((combo, idx) => {
         const combined = combo.map((job, i) => ({
-        job,
-        player: playerInfos[i].name
+            job,
+            player: playerInfos[i].name,
+            preferred: preferredJobs[i]?.includes(job)
         }));
 
         const sorted = [];
@@ -88,22 +99,24 @@ function displayResults(validCombos) {
         sorted.push(...combined.filter(p => RANGED_DPS.includes(p.job)).slice(0, 2));
 
         const jobIcon = (jobName) => {
-        const entries = Object.values(jobData).flat();
-        const found = entries.find(j => j.name === jobName);
-        return found ? found.icon : '';
+            const entries = Object.values(jobData).flat();
+            const found = entries.find(j => j.name === jobName);
+            return found ? found.icon : '';
         };
 
         area.innerHTML += `
         <div class="bg-[#003366] border border-white rounded p-4 mb-4 shadow-md w-[50%]">
             <div class="text-lg font-bold text-white mb-2">#${idx + 1} Valid Static</div>
             <div class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 items-center">
-            ${sorted.map(p => `
-                <img src="${jobIcon(p.job)}" alt="${p.job}" class="w-9 h-9 rounded" />
-                <span class="text-white">${p.player}</span>
-            `).join('')}
+                ${sorted.map(p => `
+                    <label class="cursor-pointer label-glow">
+                        ${p.preferred ? `<img class="job-glow" src="${jobIcon(p.job)}" alt="">` : ''}
+                        <img src="${jobIcon(p.job)}" alt="${p.job}" class="w-9 h-9 rounded" />
+                    </label>
+                    <span class="text-white">${p.player}</span>
+                `).join('')}
             </div>
         </div>
         `;
     });
 }
-
