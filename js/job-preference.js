@@ -54,10 +54,10 @@ window.addEventListener('DOMContentLoaded', () => {
                     jobStates[job] = 1; // Enable
                 } else if (current === 1) {
                     if (countPreferred() >= 2) {
-                        alert("You can only prefer up to 2 jobs.");
-                        return;
+                        jobStates[job] = 0; // Skip to disabled if already 2 preferred
+                    } else {
+                        jobStates[job] = 2; // Prefer
                     }
-                    jobStates[job] = 2; // Prefer
                 } else {
                     jobStates[job] = 0; // Disable
                 }

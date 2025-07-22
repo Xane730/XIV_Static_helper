@@ -2,10 +2,8 @@ const TANKS = ["Paladin", "Warrior", "Dark Knight", "Gunbreaker"];
 const PURE_HEALERS = ["White Mage", "Astrologian"];
 const SHIELD_HEALERS = ["Scholar", "Sage"];
 const MELEE_DPS = ["Monk", "Dragoon", "Ninja", "Samurai", "Reaper", "Viper"];
-const RANGED_DPS = [
-    "Bard", "Machinist", "Dancer",
-    "Black Mage", "Summoner", "Red Mage", "Pictomancer"
-];
+const RANGED_PHYSICAL_DPS = ["Bard", "Machinist", "Dancer"];
+const RANGED_MAGICAL_DPS = ["Black Mage", "Summoner", "Red Mage", "Pictomancer"];
 
 document.getElementById('validateBtn').addEventListener('click', () => {
     const players = document.querySelectorAll('#players > div');
@@ -54,14 +52,16 @@ function isValidStatic(combo) {
     const pure = flat.filter(j => PURE_HEALERS.includes(j)).length;
     const shield = flat.filter(j => SHIELD_HEALERS.includes(j)).length;
     const melee = flat.filter(j => MELEE_DPS.includes(j)).length;
-    const ranged = flat.filter(j => RANGED_DPS.includes(j)).length;
+    const rangedPhys = flat.filter(j => RANGED_PHYSICAL_DPS.includes(j)).length;
+    const rangedMagic = flat.filter(j => RANGED_MAGICAL_DPS.includes(j)).length;
 
     return (
         tanks === 2 &&
         pure === 1 &&
         shield === 1 &&
         melee === 2 &&
-        ranged === 2
+        rangedPhys === 1 &&
+        rangedMagic === 1
     );
 }
 
@@ -98,7 +98,8 @@ function displayResults(validCombos, preferredJobs) {
         sorted.push(...combined.filter(p => PURE_HEALERS.includes(p.job)).slice(0, 1));
         sorted.push(...combined.filter(p => SHIELD_HEALERS.includes(p.job)).slice(0, 1));
         sorted.push(...combined.filter(p => MELEE_DPS.includes(p.job)).slice(0, 2));
-        sorted.push(...combined.filter(p => RANGED_DPS.includes(p.job)).slice(0, 2));
+        sorted.push(...combined.filter(p => RANGED_MAGICAL_DPS.includes(p.job)).slice(0, 1));
+        sorted.push(...combined.filter(p => RANGED_PHYSICAL_DPS.includes(p.job)).slice(0, 1));
 
         const jobIcon = (jobName) => {
             const entries = Object.values(jobData).flat();
