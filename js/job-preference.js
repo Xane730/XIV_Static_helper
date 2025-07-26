@@ -31,6 +31,8 @@ function applyJobPreferenceUIToPlayer(playerDiv, playerIndex) {
                 label.insertBefore(glow, img);
             }
         });
+
+        updatePlayerImage(playerIndex);
     }
 
     function countPreferred() {

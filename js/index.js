@@ -32,6 +32,48 @@ const JOB_DATA = {
         ]
     };
 
+const PIXEL_JOB_IMAGES = {
+    "Paladin": ["Paladin.png"],
+    "Warrior": ["Warrior.png"],
+    "Dark Knight": ["Dark_Knight.png"],
+    "Gunbreaker": ["Gunbreaker.png"],
+    "White Mage": ["White_Mage.png"],
+    "Scholar": ["Scholar.png"],
+    "Astrologian": ["Astrologian.png"],
+    "Sage": ["Sage.png"],
+    "Monk": ["Monk.png"],
+    "Samurai": ["Samurai.png"],
+    "Dragoon": ["Dragoon.png"],
+    "Reaper": ["Reaper.png"],
+    "Ninja": ["Ninja.png"],
+    "Viper": ["Viper.png"],
+    "Bard": ["Bard.png"],
+    "Machinist": ["Machinist.png"],
+    "Dancer": ["Dancer.png"],
+    "Black Mage": ["Black_Mage.png"],
+    "Summoner": ["Summoner.png"],
+    "Red Mage": ["Red_Mage.png"],
+    "Pictomancer": ["Pictomancer.png"]
+};
+
+function getPixelImage(jobsPreferred, jobsAvailable) {
+    const pool = (jobsPreferred.length > 0 ? jobsPreferred : jobsAvailable)
+        .flatMap(job => PIXEL_JOB_IMAGES[job] || []);
+    if (pool.length === 0) return null;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    return `../resources/images/pixel_icons/${pick}`;
+}
+
+function updatePlayerImage(index) {
+    const stateKey = `player-${index + 1}-jobStates`;
+    const jobStates = JSON.parse(sessionStorage.getItem(stateKey)) || {};
+    const jobsAvailable = Object.keys(jobStates).filter(job => jobStates[job] > 0);
+    const jobsPreferred = Object.keys(jobStates).filter(job => jobStates[job] === 2);
+    const img = document.querySelector(`#players > div:nth-child(${index + 1}) img.player-image`);
+    const imagePath = getPixelImage(jobsPreferred, jobsAvailable);
+    if (img && imagePath) img.src = imagePath;
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     const playersContainer = document.getElementById('players');
     const jobEntries = Object.entries(JOB_DATA);
@@ -43,9 +85,16 @@ window.addEventListener('DOMContentLoaded', () => {
         const playerInfo = document.createElement('div');
         playerInfo.className = 'md:w-1/3 w-full';
         playerInfo.innerHTML = `
-            <h2 class="text-xl font-semibold mb-4">Player ${i}</h2>
-            <input type="text" placeholder="First Name" class="mb-2 w-full px-3 py-2 bg-[#002244] text-white border border-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
-            <input type="text" placeholder="Last Name" class="mb-4 w-full px-3 py-2 bg-[#002244] text-white border border-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <div class="flex gap-4 items-center mb-4">
+                <div class="bg-white p-1 rounded w-[33%] h-[33%]">
+                    <img src="../resources/images/pixel_icons/Paladin.png" class="w-auto h-auto player-image" />
+                </div>
+                <div class="flex flex-col w-full">
+                    <h2 class="text-xl font-semibold">Player ${i}</h2>
+                    <input type="text" placeholder="First Name" class="mb-2 w-full px-3 py-2 bg-[#002244] text-white border border-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                    <input type="text" placeholder="Last Name" class="w-full px-3 py-2 bg-[#002244] text-white border border-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                </div>
+            </div>
         `;
 
         const jobSelection = document.createElement('div');
@@ -132,19 +181,25 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function loadPlayerData(index) {
         const saved = sessionStorage.getItem(`player-${index}`);
+        const savedStates = sessionStorage.getItem(`player-${index}-jobStates`);
         if (!saved) return;
 
         const data = JSON.parse(saved);
         const playerDiv = document.querySelectorAll('#players > div')[index - 1];
         const inputs = playerDiv.querySelectorAll('input[type="text"]');
-        const checkboxes = playerDiv.querySelectorAll('input[type="checkbox"]');
 
-        if (data.firstName) inputs[0].value = data.firstName;
-        if (data.lastName) inputs[1].value = data.lastName;
+        if (inputs[0]) inputs[0].value = data.firstName || '';
+        if (inputs[1]) inputs[1].value = data.lastName || '';
 
-        checkboxes.forEach(cb => {
-            cb.checked = data.jobs.includes(cb.value);
-        });
+        if (savedStates) {
+            sessionStorage.setItem(`player-${index}-jobStates`, savedStates);
+        } else if (data.jobs) {
+            const jobStates = {};
+            data.jobs.forEach(job => jobStates[job] = 1);
+            sessionStorage.setItem(`player-${index}-jobStates`, JSON.stringify(jobStates));
+        }
+
+        applyJobPreferenceUIToPlayer(playerDiv, index - 1);
     }
 
     for (let i = 1; i <= 8; i++) {
@@ -223,8 +278,18 @@ document.getElementById('importBtn').addEventListener('click', () => {
                 const inputs = playerDiv.querySelectorAll('input[type="text"]');
                 const checkboxes = playerDiv.querySelectorAll('input[type="checkbox"]');
 
-                if (inputs[0]) inputs[0].value = player.firstName || '';
-                if (inputs[1]) inputs[1].value = player.lastName || '';
+                if (inputs[0]) {
+                    inputs[0].value = player.firstName || '';
+                }
+                if (inputs[1]) {
+                    inputs[1].value = player.lastName || '';
+                }
+
+                sessionStorage.setItem(`player-${index + 1}`, JSON.stringify({
+                    firstName: inputs[0]?.value || '',
+                    lastName: inputs[1]?.value || '',
+                    jobs: (player.jobsAvailable || []).concat(player.jobsPreferred || [])
+                }));
 
                 const jobStates = {};
                 (player.jobsAvailable || []).forEach(job => {
@@ -235,10 +300,7 @@ document.getElementById('importBtn').addEventListener('click', () => {
                 });
 
                 sessionStorage.setItem(`player-${index + 1}-jobStates`, JSON.stringify(jobStates));
-                const players = document.querySelectorAll('#players > div');
-                players.forEach((playerDiv, index) => {
-                    applyJobPreferenceUIToPlayer(playerDiv, index);
-                });
+                applyJobPreferenceUIToPlayer(playerDiv, index);
             });
 
             setTimeout(() => {
@@ -272,6 +334,7 @@ document.getElementById('resetBtn').addEventListener('click', () => {
         sessionStorage.removeItem(`player-${index + 1}`);
 
         applyJobPreferenceUIToPlayer(playerDiv, index);
+        updatePlayerImage(index);
     });
 
     const resultArea = document.getElementById('resultArea');

@@ -8,6 +8,18 @@ const JOB_CATEGORIES = {
 };
 
 document.getElementById('validateBtn').addEventListener('click', () => {
+    const loader = document.getElementById('resultLoader');
+    const area = document.getElementById('resultArea');
+    loader.classList.remove('hidden');
+    area.scrollTop = 0;
+
+    setTimeout(() => {
+        validateStaticComposition();
+        loader.classList.add('hidden');
+    }, 50);
+});
+
+function validateStaticComposition() {
     const players = document.querySelectorAll('#players > div');
     const selectedRoles = [];
     const preferredJobs = [];
@@ -27,10 +39,10 @@ document.getElementById('validateBtn').addEventListener('click', () => {
     }
 
     const combinations = getCombinations(selectedRoles, 8);
-    console.log("🔍 Total generated combinations:", combinations.length);
+    console.log("Total generated combinations:", combinations.length);
 
     const valid = combinations.filter(isValidStatic);
-    console.log(`✅ ${valid.length} valid combinations found`);
+    console.log(`${valid.length} valid combinations found`);
 
     valid.sort((a, b) => {
         const countPref = combo =>
@@ -40,7 +52,7 @@ document.getElementById('validateBtn').addEventListener('click', () => {
     });
 
     displayResults(valid, preferredJobs);
-});
+}
 
 function getCombinations(arrays, size) {
     const results = [];
@@ -108,7 +120,11 @@ function isValidStatic(combo) {
 
 function displayResults(validCombos, preferredJobs) {
     const area = document.getElementById('resultArea');
-    area.innerHTML = '';
+    const loader = document.getElementById('resultLoader');
+
+    area.innerHTML = ''; // reset complet
+    area.appendChild(loader); // réinsère le loader
+    loader.classList.remove('hidden');
 
     const players = document.querySelectorAll('#players > div');
     const playerInfos = Array.from(players).map((p, i) => {
@@ -138,27 +154,25 @@ function displayResults(validCombos, preferredJobs) {
 
         sorted.push(...combined.filter(p => JOB_CATEGORIES.tank.includes(p.job)));
 
-        // Healers
         const healers = combined.filter(p => 
             JOB_CATEGORIES.pure_heal.includes(p.job) || JOB_CATEGORIES.shield_heal.includes(p.job)
         );
         sorted.push(...healers);
 
-        // Melee DPS
         sorted.push(...combined.filter(p => JOB_CATEGORIES.melee.includes(p.job)));
 
-        // Ranged DPS (magical + physical)
         const ranged = combined.filter(p =>
             JOB_CATEGORIES.ranged_magic.includes(p.job) || JOB_CATEGORIES.ranged_phys.includes(p.job)
         );
         sorted.push(...ranged);
 
         const jobIcon = (jobName) => {
-            const entries = Object.values(jobData).flat();
+            const entries = Object.values(JOB_DATA).flat();
             const found = entries.find(j => j.name === jobName);
             return found ? found.icon : '';
         };
 
+        document.getElementById('resultLoader').classList.add('hidden');
         area.innerHTML += `
         <div class="bg-[#003366] border border-white rounded p-4 mb-4 shadow-md w-[50%]">
             <div class="text-lg font-bold text-white mb-1">#${idx + 1} Valid Static</div>
