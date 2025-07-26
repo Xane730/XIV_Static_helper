@@ -33,8 +33,6 @@ const jobData = {
     };
 
 window.addEventListener('DOMContentLoaded', () => {
-    
-
     const playersContainer = document.getElementById('players');
     const jobEntries = Object.entries(jobData);
 
@@ -164,4 +162,118 @@ window.addEventListener('DOMContentLoaded', () => {
             checkbox.addEventListener('change', () => savePlayerData(i));
         });
     }
+});
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+    const players = document.querySelectorAll('#players > div');
+    const exportData = [];
+
+    players.forEach((player, index) => {
+        const first = player.querySelector('input[placeholder="First Name"]')?.value.trim();
+        const last = player.querySelector('input[placeholder="Last Name"]')?.value.trim();
+        const stateKey = `player-${index + 1}-jobStates`;
+        const jobStates = JSON.parse(sessionStorage.getItem(stateKey)) || {};
+
+        const jobsAvailable = Object.keys(jobStates).filter(job => jobStates[job] > 0);
+        const jobsPreferred = Object.keys(jobStates).filter(job => jobStates[job] === 2);
+
+        exportData.push({
+            firstName: first,
+            lastName: last,
+            jobsAvailable,
+            jobsPreferred
+        });
+    });
+
+    const now = new Date();
+    const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const fileName = `static-composition-${timestamp}.json`;
+
+    const json = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+
+    URL.revokeObjectURL(url);
+});
+
+document.getElementById('importBtn').addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+
+    input.addEventListener('change', async () => {
+        const file = input.files[0];
+        if (!file) return;
+
+        const content = await file.text();
+        try {
+            const data = JSON.parse(content);
+            if (!Array.isArray(data) || data.length !== 8) {
+                alert("Invalid file format or player count.");
+                return;
+            }
+
+            data.forEach((player, index) => {
+                const playerDiv = document.querySelectorAll('#players > div')[index];
+                const inputs = playerDiv.querySelectorAll('input[type="text"]');
+                const checkboxes = playerDiv.querySelectorAll('input[type="checkbox"]');
+
+                if (inputs[0]) inputs[0].value = player.firstName || '';
+                if (inputs[1]) inputs[1].value = player.lastName || '';
+
+                const jobStates = {};
+                (player.jobsAvailable || []).forEach(job => {
+                    jobStates[job] = 1;
+                });
+                (player.jobsPreferred || []).forEach(job => {
+                    jobStates[job] = 2;
+                });
+
+                sessionStorage.setItem(`player-${index + 1}-jobStates`, JSON.stringify(jobStates));
+                const players = document.querySelectorAll('#players > div');
+                players.forEach((playerDiv, index) => {
+                    applyJobPreferenceUIToPlayer(playerDiv, index);
+                });
+            });
+
+            setTimeout(() => {
+                const script = document.createElement('script');
+                script.src = '../js/job-preference.js';
+                document.body.appendChild(script);
+            }, 100);
+        } catch (e) {
+            alert("Failed to import: invalid JSON.");
+        }
+    });
+
+    input.click();
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+    const players = document.querySelectorAll('#players > div');
+
+    players.forEach((playerDiv, index) => {
+        const inputs = playerDiv.querySelectorAll('input[type="text"]');
+        inputs.forEach(input => input.value = '');
+
+        const stateKey = `player-${index + 1}-jobStates`;
+        const emptyState = {};
+
+        Object.values(jobData).flat().forEach(job => {
+            emptyState[job.name] = 0;
+        });
+
+        sessionStorage.setItem(stateKey, JSON.stringify(emptyState));
+        sessionStorage.removeItem(`player-${index + 1}`);
+
+        applyJobPreferenceUIToPlayer(playerDiv, index);
+    });
+
+    const resultArea = document.getElementById('resultArea');
+    if (resultArea) resultArea.innerHTML = '';
 });
