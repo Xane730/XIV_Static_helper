@@ -1,9 +1,11 @@
-const TANKS = ["Paladin", "Warrior", "Dark Knight", "Gunbreaker"];
-const PURE_HEALERS = ["White Mage", "Astrologian"];
-const SHIELD_HEALERS = ["Scholar", "Sage"];
-const MELEE_DPS = ["Monk", "Dragoon", "Ninja", "Samurai", "Reaper", "Viper"];
-const RANGED_PHYSICAL_DPS = ["Bard", "Machinist", "Dancer"];
-const RANGED_MAGICAL_DPS = ["Black Mage", "Summoner", "Red Mage", "Pictomancer"];
+const JOB_CATEGORIES = {
+    tank: ["Paladin", "Warrior", "Dark Knight", "Gunbreaker"],
+    pure_heal: ["White Mage", "Astrologian"],
+    shield_heal: ["Scholar", "Sage"],
+    melee: ["Monk", "Dragoon", "Ninja", "Samurai", "Reaper", "Viper"],
+    ranged_phys: ["Bard", "Machinist", "Dancer"],
+    ranged_magic: ["Black Mage", "Summoner", "Red Mage", "Pictomancer"]
+};
 
 document.getElementById('validateBtn').addEventListener('click', () => {
     const players = document.querySelectorAll('#players > div');
@@ -19,8 +21,16 @@ document.getElementById('validateBtn').addEventListener('click', () => {
         preferredJobs.push(preferred);
     });
 
+    if (selectedRoles.some(list => list.length === 0)) {
+        alert("Each player must have at least one job selected.");
+        return;
+    }
+
     const combinations = getCombinations(selectedRoles, 8);
+    console.log("🔍 Total generated combinations:", combinations.length);
+
     const valid = combinations.filter(isValidStatic);
+    console.log(`✅ ${valid.length} valid combinations found`);
 
     valid.sort((a, b) => {
         const countPref = combo =>
@@ -32,37 +42,68 @@ document.getElementById('validateBtn').addEventListener('click', () => {
     displayResults(valid, preferredJobs);
 });
 
-function getCombinations(arr, size) {
-    if (arr.length === 0) return [[]];
-    const [first, ...rest] = arr;
-    const restComb = getCombinations(rest, size - 1);
-    return first.flatMap(option =>
-        restComb.map(comb => [option, ...comb])
-    );
+function getCombinations(arrays, size) {
+    const results = [];
+    function backtrack(index, path) {
+        if (index === size) {
+            results.push([...path]);
+            return;
+        }
+        for (const job of arrays[index]) {
+            if (!job) continue;
+            path.push(job);
+            backtrack(index + 1, path);
+            path.pop();
+        }
+    }
+    backtrack(0, []);
+    return results;
 }
 
 function isValidStatic(combo) {
     if (combo.length !== 8) return false;
 
-    const flat = combo.flat();
-    const uniqueJobs = new Set(flat);
-    if (uniqueJobs.size !== flat.length) return false;
+    const allowDuplicateRoles = document.getElementById('allowDuplicateRoles')?.checked;
+    const allowSameHealType = document.getElementById('allowSameHealType')?.checked;
+    const allowSameRanged = document.getElementById('allowSameRanged')?.checked;
 
-    const tanks = flat.filter(j => TANKS.includes(j)).length;
-    const pure = flat.filter(j => PURE_HEALERS.includes(j)).length;
-    const shield = flat.filter(j => SHIELD_HEALERS.includes(j)).length;
-    const melee = flat.filter(j => MELEE_DPS.includes(j)).length;
-    const rangedPhys = flat.filter(j => RANGED_PHYSICAL_DPS.includes(j)).length;
-    const rangedMagic = flat.filter(j => RANGED_MAGICAL_DPS.includes(j)).length;
+    const uniqueJobs = new Set(combo);
+    if (!allowDuplicateRoles && uniqueJobs.size !== combo.length) return false;
 
-    return (
-        tanks === 2 &&
-        pure === 1 &&
-        shield === 1 &&
-        melee === 2 &&
-        rangedPhys === 1 &&
-        rangedMagic === 1
+    const roleCounts = {
+        tank: 0,
+        pure_heal: 0,
+        shield_heal: 0,
+        melee: 0,
+        ranged_phys: 0,
+        ranged_magic: 0
+    };
+
+    for (const job of combo) {
+        for (const [role, jobs] of Object.entries(JOB_CATEGORIES)) {
+            if (jobs.includes(job)) {
+                roleCounts[role]++;
+            }
+        }
+    }
+
+    if (roleCounts.tank !== 2) return false;
+    if (roleCounts.melee !== 2) return false;
+
+    const totalHealers = roleCounts.pure_heal + roleCounts.shield_heal;
+    const totalRanged = roleCounts.ranged_phys + roleCounts.ranged_magic;
+
+    const validHeal = totalHealers === 2 && (
+        (roleCounts.pure_heal === 1 && roleCounts.shield_heal === 1) ||
+        (allowSameHealType && (roleCounts.pure_heal === 2 || roleCounts.shield_heal === 2))
     );
+
+    const validRanged = totalRanged === 2 && (
+        (roleCounts.ranged_phys === 1 && roleCounts.ranged_magic === 1) ||
+        (allowSameRanged && (roleCounts.ranged_phys === 2 || roleCounts.ranged_magic === 2))
+    )
+
+    return validHeal && validRanged;
 }
 
 function displayResults(validCombos, preferredJobs) {
@@ -94,12 +135,23 @@ function displayResults(validCombos, preferredJobs) {
         const preferenceScore = Math.round((preferredCount / 8) * 100);
 
         const sorted = [];
-        sorted.push(...combined.filter(p => TANKS.includes(p.job)).slice(0, 2));
-        sorted.push(...combined.filter(p => PURE_HEALERS.includes(p.job)).slice(0, 1));
-        sorted.push(...combined.filter(p => SHIELD_HEALERS.includes(p.job)).slice(0, 1));
-        sorted.push(...combined.filter(p => MELEE_DPS.includes(p.job)).slice(0, 2));
-        sorted.push(...combined.filter(p => RANGED_MAGICAL_DPS.includes(p.job)).slice(0, 1));
-        sorted.push(...combined.filter(p => RANGED_PHYSICAL_DPS.includes(p.job)).slice(0, 1));
+
+        sorted.push(...combined.filter(p => JOB_CATEGORIES.tank.includes(p.job)));
+
+        // Healers
+        const healers = combined.filter(p => 
+            JOB_CATEGORIES.pure_heal.includes(p.job) || JOB_CATEGORIES.shield_heal.includes(p.job)
+        );
+        sorted.push(...healers);
+
+        // Melee DPS
+        sorted.push(...combined.filter(p => JOB_CATEGORIES.melee.includes(p.job)));
+
+        // Ranged DPS (magical + physical)
+        const ranged = combined.filter(p =>
+            JOB_CATEGORIES.ranged_magic.includes(p.job) || JOB_CATEGORIES.ranged_phys.includes(p.job)
+        );
+        sorted.push(...ranged);
 
         const jobIcon = (jobName) => {
             const entries = Object.values(jobData).flat();
