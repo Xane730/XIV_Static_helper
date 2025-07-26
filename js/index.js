@@ -1,4 +1,4 @@
-const jobData = {
+const JOB_DATA = {
         "Tank": [
             { "name": "Paladin", "icon": "../resources/images/Paladin_Icon.png" },
             { "name": "Warrior", "icon": "../resources/images/Warrior_Icon.png" },
@@ -34,7 +34,7 @@ const jobData = {
 
 window.addEventListener('DOMContentLoaded', () => {
     const playersContainer = document.getElementById('players');
-    const jobEntries = Object.entries(jobData);
+    const jobEntries = Object.entries(JOB_DATA);
 
     for (let i = 1; i <= 8; i++) {
         const playerDiv = document.createElement('div');
@@ -57,7 +57,7 @@ window.addEventListener('DOMContentLoaded', () => {
             <div>
                 <h3 class="font-semibold text-sm text-blue-200 mb-1">${category}</h3>
                 <div class="flex flex-wrap gap-1 p-1 bg-[#001933] rounded">
-                ${jobData[category].map(job => `
+                ${JOB_DATA[category].map(job => `
                     <label class="cursor-pointer">
                         <input type="checkbox" class="peer hidden" name="job-${i}" value="${job.name}" />
                         <img src="${job.icon}" alt="${job.name}" title="${job.name}"
@@ -72,7 +72,7 @@ window.addEventListener('DOMContentLoaded', () => {
             <div>
             <h3 class="font-semibold text-sm text-blue-200 mb-1">Melee DPS</h3>
             <div class="flex flex-wrap gap-1 p-1 bg-[#001933] rounded w-fit">
-                ${jobData["Melee DPS"].map(job => `
+                ${JOB_DATA["Melee DPS"].map(job => `
                 <label class="cursor-pointer">
                     <input type="checkbox" class="peer hidden" name="job-${i}" value="${job.name}" />
                     <img src="${job.icon}" alt="${job.name}" title="${job.name}"
@@ -85,7 +85,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 <h3 class="font-semibold text-sm text-blue-200 mb-1">Ranged DPS</h3>
                 <div class="flex">
                     <div class="flex flex-wrap gap-1 p-1 bg-[#001933] rounded w-fit">
-                        ${jobData["Physical Ranged DPS"].map(job => `
+                        ${JOB_DATA["Physical Ranged DPS"].map(job => `
                         <label class="cursor-pointer">
                             <input type="checkbox" class="peer hidden" name="job-${i}" value="${job.name}" />
                             <img src="${job.icon}" alt="${job.name}" title="${job.name}"
@@ -95,7 +95,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="w-[2%] h-1"></div>
                     <div class="flex flex-wrap gap-1 p-1 bg-[#001933] rounded w-fit">
-                        ${jobData["Magical Ranged DPS"].map(job => `
+                        ${JOB_DATA["Magical Ranged DPS"].map(job => `
                         <label class="cursor-pointer">
                             <input type="checkbox" class="peer hidden" name="job-${i}" value="${job.name}" />
                             <img src="${job.icon}" alt="${job.name}" title="${job.name}"
@@ -264,7 +264,7 @@ document.getElementById('resetBtn').addEventListener('click', () => {
         const stateKey = `player-${index + 1}-jobStates`;
         const emptyState = {};
 
-        Object.values(jobData).flat().forEach(job => {
+        Object.values(JOB_DATA).flat().forEach(job => {
             emptyState[job.name] = 0;
         });
 
