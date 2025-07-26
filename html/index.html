@@ -103,7 +103,10 @@
             <!-- Résultats -->
             <div class="flex-1 flex flex-col bg-[#001a33] rounded-lg border border-white shadow overflow-hidden">
                 <div class="text-center text-xl py-2 border-b border-white bg-[#003366]">Results</div>
-                <div id="resultArea" class="overflow-y-auto p-4 text-white font-mono text-sm h-full scrollbar-hide flex flex-col items-center">
+                <div id="resultArea" class="overflow-y-auto p-4 text-white font-mono text-sm h-full scrollbar-hide flex flex-col items-center gap-2">
+                    <div id="resultLoader" class="text-center animate-pulse text-yellow-300 hidden">
+                        <span class="text-lg">Validating...</span>
+                    </div>
                     <!-- Résultats dynamiques ici -->
                 </div>
             </div>

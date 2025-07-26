@@ -36,24 +36,24 @@ const PIXEL_JOB_IMAGES = {
     "Paladin": ["Paladin.png"],
     "Warrior": ["Warrior.png"],
     "Dark Knight": ["Dark_Knight.png"],
-    "Gunbreaker": ["Paladin.png", "Warrior.png", "Dark_Knight.png"],
+    "Gunbreaker": ["Gunbreaker.png"],
     "White Mage": ["White_Mage.png"],
     "Scholar": ["Scholar.png"],
     "Astrologian": ["Astrologian.png"],
-    "Sage": ["White_Mage.png", "Scholar.png", "Astrologian.png"],
+    "Sage": ["Sage.png"],
     "Monk": ["Monk.png"],
-    "Samurai": ["Monk.png"],
+    "Samurai": ["Samurai.png"],
     "Dragoon": ["Dragoon.png"],
-    "Reaper": ["Dragoon.png"],
+    "Reaper": ["Reaper.png"],
     "Ninja": ["Ninja.png"],
-    "Viper": ["Ninja.png"],
+    "Viper": ["Viper.png"],
     "Bard": ["Bard.png"],
     "Machinist": ["Machinist.png"],
-    "Dancer": ["Bard.png"],
+    "Dancer": ["Dancer.png"],
     "Black Mage": ["Black_Mage.png"],
     "Summoner": ["Summoner.png"],
-    "Red Mage": ["Black_Mage.png", "Summoner.png"],
-    "Pictomancer": ["Black_Mage.png", "Summoner.png"]
+    "Red Mage": ["Red_Mage.png"],
+    "Pictomancer": ["Pictomancer.png"]
 };
 
 function getPixelImage(jobsPreferred, jobsAvailable) {
@@ -181,20 +181,25 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function loadPlayerData(index) {
         const saved = sessionStorage.getItem(`player-${index}`);
+        const savedStates = sessionStorage.getItem(`player-${index}-jobStates`);
         if (!saved) return;
 
         const data = JSON.parse(saved);
         const playerDiv = document.querySelectorAll('#players > div')[index - 1];
         const inputs = playerDiv.querySelectorAll('input[type="text"]');
-        const checkboxes = playerDiv.querySelectorAll('input[type="checkbox"]');
 
-        if (data.firstName) inputs[0].value = data.firstName;
-        if (data.lastName) inputs[1].value = data.lastName;
+        if (inputs[0]) inputs[0].value = data.firstName || '';
+        if (inputs[1]) inputs[1].value = data.lastName || '';
 
-        checkboxes.forEach(cb => {
-            cb.checked = data.jobs.includes(cb.value);
-        });
-        updatePlayerImage(i - 1);
+        if (savedStates) {
+            sessionStorage.setItem(`player-${index}-jobStates`, savedStates);
+        } else if (data.jobs) {
+            const jobStates = {};
+            data.jobs.forEach(job => jobStates[job] = 1);
+            sessionStorage.setItem(`player-${index}-jobStates`, JSON.stringify(jobStates));
+        }
+
+        applyJobPreferenceUIToPlayer(playerDiv, index - 1);
     }
 
     for (let i = 1; i <= 8; i++) {
@@ -273,8 +278,18 @@ document.getElementById('importBtn').addEventListener('click', () => {
                 const inputs = playerDiv.querySelectorAll('input[type="text"]');
                 const checkboxes = playerDiv.querySelectorAll('input[type="checkbox"]');
 
-                if (inputs[0]) inputs[0].value = player.firstName || '';
-                if (inputs[1]) inputs[1].value = player.lastName || '';
+                if (inputs[0]) {
+                    inputs[0].value = player.firstName || '';
+                }
+                if (inputs[1]) {
+                    inputs[1].value = player.lastName || '';
+                }
+
+                sessionStorage.setItem(`player-${index + 1}`, JSON.stringify({
+                    firstName: inputs[0]?.value || '',
+                    lastName: inputs[1]?.value || '',
+                    jobs: (player.jobsAvailable || []).concat(player.jobsPreferred || [])
+                }));
 
                 const jobStates = {};
                 (player.jobsAvailable || []).forEach(job => {
@@ -285,10 +300,7 @@ document.getElementById('importBtn').addEventListener('click', () => {
                 });
 
                 sessionStorage.setItem(`player-${index + 1}-jobStates`, JSON.stringify(jobStates));
-                const players = document.querySelectorAll('#players > div');
-                players.forEach((playerDiv, index) => {
-                    applyJobPreferenceUIToPlayer(playerDiv, index);
-                });
+                applyJobPreferenceUIToPlayer(playerDiv, index);
             });
 
             setTimeout(() => {
