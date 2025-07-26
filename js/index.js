@@ -33,8 +33,6 @@ const jobData = {
     };
 
 window.addEventListener('DOMContentLoaded', () => {
-    
-
     const playersContainer = document.getElementById('players');
     const jobEntries = Object.entries(jobData);
 
@@ -254,4 +252,28 @@ document.getElementById('importBtn').addEventListener('click', () => {
     });
 
     input.click();
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+    const players = document.querySelectorAll('#players > div');
+
+    players.forEach((playerDiv, index) => {
+        const inputs = playerDiv.querySelectorAll('input[type="text"]');
+        inputs.forEach(input => input.value = '');
+
+        const stateKey = `player-${index + 1}-jobStates`;
+        const emptyState = {};
+
+        Object.values(jobData).flat().forEach(job => {
+            emptyState[job.name] = 0;
+        });
+
+        sessionStorage.setItem(stateKey, JSON.stringify(emptyState));
+        sessionStorage.removeItem(`player-${index + 1}`);
+
+        applyJobPreferenceUIToPlayer(playerDiv, index);
+    });
+
+    const resultArea = document.getElementById('resultArea');
+    if (resultArea) resultArea.innerHTML = '';
 });
