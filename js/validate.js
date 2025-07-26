@@ -138,23 +138,20 @@ function displayResults(validCombos, preferredJobs) {
 
         sorted.push(...combined.filter(p => JOB_CATEGORIES.tank.includes(p.job)));
 
-        // Healers
         const healers = combined.filter(p => 
             JOB_CATEGORIES.pure_heal.includes(p.job) || JOB_CATEGORIES.shield_heal.includes(p.job)
         );
         sorted.push(...healers);
 
-        // Melee DPS
         sorted.push(...combined.filter(p => JOB_CATEGORIES.melee.includes(p.job)));
 
-        // Ranged DPS (magical + physical)
         const ranged = combined.filter(p =>
             JOB_CATEGORIES.ranged_magic.includes(p.job) || JOB_CATEGORIES.ranged_phys.includes(p.job)
         );
         sorted.push(...ranged);
 
         const jobIcon = (jobName) => {
-            const entries = Object.values(jobData).flat();
+            const entries = Object.values(JOB_DATA).flat();
             const found = entries.find(j => j.name === jobName);
             return found ? found.icon : '';
         };

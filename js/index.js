@@ -32,6 +32,48 @@ const JOB_DATA = {
         ]
     };
 
+const PIXEL_JOB_IMAGES = {
+    "Paladin": ["Paladin.png"],
+    "Warrior": ["Warrior.png"],
+    "Dark Knight": ["Dark_Knight.png"],
+    "Gunbreaker": ["Paladin.png", "Warrior.png", "Dark_Knight.png"],
+    "White Mage": ["White_Mage.png"],
+    "Scholar": ["Scholar.png"],
+    "Astrologian": ["Astrologian.png"],
+    "Sage": ["White_Mage.png", "Scholar.png", "Astrologian.png"],
+    "Monk": ["Monk.png"],
+    "Samurai": ["Monk.png"],
+    "Dragoon": ["Dragoon.png"],
+    "Reaper": ["Dragoon.png"],
+    "Ninja": ["Ninja.png"],
+    "Viper": ["Ninja.png"],
+    "Bard": ["Bard.png"],
+    "Machinist": ["Machinist.png"],
+    "Dancer": ["Bard.png"],
+    "Black Mage": ["Black_Mage.png"],
+    "Summoner": ["Summoner.png"],
+    "Red Mage": ["Black_Mage.png", "Summoner.png"],
+    "Pictomancer": ["Black_Mage.png", "Summoner.png"]
+};
+
+function getPixelImage(jobsPreferred, jobsAvailable) {
+    const pool = (jobsPreferred.length > 0 ? jobsPreferred : jobsAvailable)
+        .flatMap(job => PIXEL_JOB_IMAGES[job] || []);
+    if (pool.length === 0) return null;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    return `../resources/images/pixel_icons/${pick}`;
+}
+
+function updatePlayerImage(index) {
+    const stateKey = `player-${index + 1}-jobStates`;
+    const jobStates = JSON.parse(sessionStorage.getItem(stateKey)) || {};
+    const jobsAvailable = Object.keys(jobStates).filter(job => jobStates[job] > 0);
+    const jobsPreferred = Object.keys(jobStates).filter(job => jobStates[job] === 2);
+    const img = document.querySelector(`#players > div:nth-child(${index + 1}) img.player-image`);
+    const imagePath = getPixelImage(jobsPreferred, jobsAvailable);
+    if (img && imagePath) img.src = imagePath;
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     const playersContainer = document.getElementById('players');
     const jobEntries = Object.entries(JOB_DATA);
@@ -43,9 +85,16 @@ window.addEventListener('DOMContentLoaded', () => {
         const playerInfo = document.createElement('div');
         playerInfo.className = 'md:w-1/3 w-full';
         playerInfo.innerHTML = `
-            <h2 class="text-xl font-semibold mb-4">Player ${i}</h2>
-            <input type="text" placeholder="First Name" class="mb-2 w-full px-3 py-2 bg-[#002244] text-white border border-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
-            <input type="text" placeholder="Last Name" class="mb-4 w-full px-3 py-2 bg-[#002244] text-white border border-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <div class="flex gap-4 items-center mb-4">
+                <div class="bg-white p-1 rounded w-[33%] h-[33%]">
+                    <img src="../resources/images/pixel_icons/Paladin.png" class="w-auto h-auto player-image" />
+                </div>
+                <div class="flex flex-col w-full">
+                    <h2 class="text-xl font-semibold">Player ${i}</h2>
+                    <input type="text" placeholder="First Name" class="mb-2 w-full px-3 py-2 bg-[#002244] text-white border border-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                    <input type="text" placeholder="Last Name" class="w-full px-3 py-2 bg-[#002244] text-white border border-white rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                </div>
+            </div>
         `;
 
         const jobSelection = document.createElement('div');
@@ -145,6 +194,7 @@ window.addEventListener('DOMContentLoaded', () => {
         checkboxes.forEach(cb => {
             cb.checked = data.jobs.includes(cb.value);
         });
+        updatePlayerImage(i - 1);
     }
 
     for (let i = 1; i <= 8; i++) {
@@ -272,6 +322,7 @@ document.getElementById('resetBtn').addEventListener('click', () => {
         sessionStorage.removeItem(`player-${index + 1}`);
 
         applyJobPreferenceUIToPlayer(playerDiv, index);
+        updatePlayerImage(index);
     });
 
     const resultArea = document.getElementById('resultArea');
