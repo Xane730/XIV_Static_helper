@@ -1,26 +1,58 @@
 # XIV Static Helper
 
-**XIV Static Helper** is a lightweight HTML/JavaScript tool designed to help build and validate an 8-player static composition for Final Fantasy XIV.
+A web tool to help build and validate **Final Fantasy XIV static raid compositions**, ensuring balanced and optimal team setups.
 
-## Features
+🔗 <a href="https://xane730.github.io/XIV_Static_helper/html/" target="_blank">Live site</a>
 
-- Enter player names and select available jobs per player using job icons
-- Validate static compositions based on the following rules:
-  - 2 Tanks
-  - 2 Healer (1 Pure & 1 Shield)
-  - 2 Melee DPS
-  - 2 Ranged DPS
-  - No duplicate jobs
-- Displays all valid static combinations
-- Automatically saves your input locally using browser storage
+---
 
-## Usage
+## 🎯 Purpose
 
-1. Open `index.html` in a modern browser (Firefox recommended for local use).
-2. Fill in player names and select jobs they can play.
-3. Click the **"Validate Static"** button to view all valid static combinations.
-4. Selections and names are automatically saved and restored when the page is reloaded.
+This tool allows you to easily build a **party of 8 players** and validate it against standard raid composition rules in FFXIV. It's especially useful for statics preparing for high-end content like Savage or Ultimate raids.
 
-### The Link :
+---
 
-https://xane730.github.io/XIV_Static_helper/html/
+## 🧠 How It Works
+
+### ✅ Default Valid Composition
+
+A valid party includes:
+- **2 Tanks**
+- **1 Pure Healer** (*White Mage* or *Astrologian*)
+- **1 Barrier Healer** (*Scholar* or *Sage*)
+- **2 Melee DPS**
+- **2 Ranged DPS** (either physical or magical)
+
+### ⚙️ Customizable Options
+
+Inside the **Control Panel**, you can tweak the validation rules:
+- Allow **duplicate roles** (same job used by multiple players)
+- Allow **two ranged DPS of the same type** (e.g., two casters or two physical ranged)
+- Allow **two healers of the same type** (e.g., two pure healers)
+
+### 👥 Player Panel
+
+Each player can:
+- Enter a **first and last name**
+- Select one or more **available jobs**
+- Mark **preferred jobs**
+- See a **dynamic image** based on their selected/preferred job
+
+### 🔄 Available Actions
+
+- **Validate**: Check all possible team combinations that match your current rules
+- **Import / Export**: Save or load your static as a JSON file
+- **Reset**: Clear all current selections
+
+---
+
+## 📦 Project Structure
+
+This is a **fully client-side project** built in **Vanilla JavaScript** and **Tailwind CSS** — no frameworks.
+
+Key files:
+- `index.html` — main page
+- `index.js` — main logic and event handling
+- `validate.js` — team validation rules and generation
+- `storage.js` — handles sessionStorage logic
+- `assets/img/` — dynamic job images
